@@ -50,7 +50,7 @@ The folder structure is as follows.
 
 `pattern` : Custom pattern files( `.js` ).
 
-*** All files and folders are required.**
+**\* All files and folders are required.**
 
 <br><br>
 
@@ -65,10 +65,9 @@ Compile progresses with reference to pattern file. Compilation results are retur
 <br>
 
 ```javascript
-module.exports = function( OBJ, GEN ) { 
-    
-  /* Please write your code */ 
-}
+module.exports = function (OBJ, GEN) {
+  /* Please write your code */
+};
 ```
 
 The following code shall be included in the `pattern/*.js` file.
@@ -90,7 +89,7 @@ GEN is a function that helps you create files.
 ##### initialization
 
 ```javascript
-var api = new GEN( "file path" )
+var api = new GEN("file path");
 ```
 
 <br>
@@ -113,38 +112,41 @@ Object created through `accp --compile`.
 OBJ = {
 
   API: [ ( CLASS ) {
-  
+
       BASE: String,
       NAME: String,
       MARK: String,
       FUNC: [ ( FUNC ) {
-          
+
           CODE: Int,
           NAME: String,
           DESC: String
-      
+
           /* Request method: address */
           ( GET | PUT | POST | PATCH | DELETE ): String
-      
+
+          /* Path parameters extracted from request address */
+          PARAM: [ String, ... ]
+
           /* Completion status */
           COMP: ( true | false )
-      
+
           /* Associative process */
           PROC: [ {
-            
+
               CODE: Int ( CLASS.FUNC.CODE ),
               NAME: String ( CLASS.FUNC.NAME )
           }, ... ],
-          
+
           /* Comments about this function */
           MARK: [ {
-              
+
               NAME: String,
               MARK: String
           }, ... ],
-          
+
           REQ: [ ( DATA ) {
-              
+
               NAME: String,
               MARK: String,
               CLASS: String,
@@ -155,21 +157,21 @@ OBJ = {
                   key: String, ...
               }
           }, ... ],
-          
+
           /* Be the same as REQ */
           RES: [ { ... } ],
-          
+
           /* User defined value */
           OPT: {
-            
+
               key: ( true | false ),
               key: ( true | false ), ...
           }
       }, ... ]
   }, ... ],
-  
+
   CODE: [ ( CLASS ) {
-    
+
       NAME: String,
       MARK: String,
       CODE: [ {
@@ -177,18 +179,18 @@ OBJ = {
           CODE: Int,
           NAME: String,
           MARK: {
-              
+
               key: String,
               key: String, ...
           }
       } ],
   }, ... ],
-    
+
   STRUCT: [ {
-              
+
       NAME: String,
       MARK: String,
-      
+
       /* Be the same as REQ.DATA */
       DATA: [ { ... } ]
   }, ... ]
@@ -207,7 +209,7 @@ accp language is provided as a [visual code extension program](https://marketpla
 
 ![](https://cdn.bettep.org/accp/2.webp)
 
-###### Usage prefix 
+###### Usage prefix
 
 `API` : Snippet for api.
 
@@ -274,6 +276,8 @@ accp language is provided as a [visual code extension program](https://marketpla
 `1.3.3` : Modified Angular & NodeJS sample file and fixed issue with false value not being applied to OPT parameter.
 
 `1.4.3` : Enhanced data validation features, more reliable error log output.
+
+`1.4.4` : Add path parameter support with REQ block validation and syntax highlighting (e.g., :id in GET user/:id).
 
 <br><br>
 

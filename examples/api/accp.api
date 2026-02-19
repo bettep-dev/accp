@@ -4,10 +4,10 @@ import struct/accp.struct
 
 API {
 
-  /* mark 1 */
-  TEST1 class description {
+  /* basic example */
+  TEST class description {
 
-    BASE http://localhost:8080/test1
+    BASE http://localhost:8080/test
 
     GetTest 100 function description {
 
@@ -15,15 +15,14 @@ API {
 
       PROC {
 
-        101 TEST1.PostTest
-        201 TEST2.DeleteTest
+        101 TEST.PostTest
       }
 
       MARK {
 
         param1 mark variable explain
       }
-      
+
       OPT {
 
         option1 true
@@ -37,10 +36,10 @@ API {
         param1 Int int variable
         param2 Data data variable
         param3 Float float variable
-        param4 Double double variable 
+        param4 Double double variable
         param5 String string variable
         param6 Boolean boolean variable
-        param7 Parameter struct variable 
+        param7 Parameter struct variable
         param8 Int description of the value {
 
           0= explain value
@@ -55,7 +54,7 @@ API {
         param1 Int int variable
         param2 Data data variable
         param3 Float float variable
-        param4 Double double variable 
+        param4 Double double variable
         param5 String string variable
         param6 Boolean boolean variable
         param7 Response struct variable
@@ -87,10 +86,10 @@ API {
         param1 Int int variable
         param2 Data data variable
         param3 Float float variable
-        param4 Double double variable 
+        param4 Double double variable
         param5 String string variable
         param6 Boolean boolean variable
-        param7 Parameter struct variable 
+        param7 Parameter struct variable
         param8 Int description of the value {
 
           0= explain value
@@ -105,7 +104,7 @@ API {
         param1 Int int variable
         param2 Data data variable
         param3 Float float variable
-        param4 Double double variable 
+        param4 Double double variable
         param5 String string variable
         param6 Boolean boolean variable
         param7 Response struct variable
@@ -122,108 +121,44 @@ API {
     }
   }
 
-  /* mark 2 */
-  TEST2 class description {
+  /* path parameter example */
+  TEST_PATH class description {
 
-    BASE http://localhost:8080/test2
+    BASE http://localhost:8080/test_path
 
-    PutTest 200 function description {
-
-      COMP true      
-
-      MARK {
-
-        param1 mark variable explain
-      }
-
-      PUT test
-
-      REQ {
-
-        param1 Int int variable
-        param2 Data data variable
-        param3 Float float variable
-        param4 Double double variable 
-        param5 String string variable
-        param6 Boolean boolean variable
-        param7 Parameter struct variable 
-        param8 Int description of the value {
-
-          0= explain value
-          1> explain value
-          2< explain value
-          3! explain value
-        }
-      }
-
-      RES {
-
-        param1 Int int variable
-        param2 Data data variable
-        param3 Float float variable
-        param4 Double double variable 
-        param5 String string variable
-        param6 Boolean boolean variable
-        param7 Response struct variable
-        param8 Int description of the value {
-
-          0= explain value
-          1> explain value
-          2< explain value
-          3! explain value
-        }
-        param9 [Int] int array variable
-        param10 [Parameter] struct array variable
-      }
-    }
-
-    DeleteTest 201 function description {
+    GetTestByPath 200 function description {
 
       COMP true
 
-      MARK {
-
-        param1 mark variable explain
-      }
-
-      DELETE test
+      GET test/:param1
 
       REQ {
 
-        param1 Int int variable
-        param2 Data data variable
-        param3 Float float variable
-        param4 Double double variable 
-        param5 String string variable
-        param6 Boolean boolean variable
-        param7 Parameter struct variable 
-        param8 Int description of the value {
-
-          0= explain value
-          1> explain value
-          2< explain value
-          3! explain value
-        }
+        param1 Int int variable *
       }
 
       RES {
 
         param1 Int int variable
-        param2 Data data variable
-        param3 Float float variable
-        param4 Double double variable 
-        param5 String string variable
-        param6 Boolean boolean variable
-        param7 Response struct variable
-        param8 Int description of the value {
+      }
+    }
 
-          0= explain value
-          1> explain value
-          2< explain value
-          3! explain value
-        }
-        param9 [Int] int array variable
-        param10 [Parameter] struct array variable
+    PutTextByPath 201 function description {
+
+      COMP true
+
+      PUT test/:param1/:param1
+
+      REQ {
+
+        param1 Int int variable *
+        param2 String string variable *
+        param3 String string variable
+      }
+
+      RES {
+
+        param1 Int int variable
       }
     }
   }

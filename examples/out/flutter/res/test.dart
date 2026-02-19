@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'package:flutter/pub/struct.dart';
 
-part 'test1.g.dart';
+part 'test.g.dart';
 
 /// Description: function description
 @JsonSerializable()

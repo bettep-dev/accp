@@ -34,16 +34,16 @@ import {
 } from 'src/environments/environment'
 
 /* import request */
-import * as Req from '../req/test2'
+import * as Req from '../req/test'
 
 /* import response */
-import * as Res from '../res/test2'
+import * as Res from '../res/test'
 
 @Injectable( {
 
   providedIn: 'root'
 } )
-export class Test2Service {
+export class TestService {
 
   constructor(
 
@@ -98,15 +98,15 @@ export class Test2Service {
   
   /** 
    * Description: function description 
-     - Code: 200
+     - Code: 100
      - Complete: true
    *
    * Process: 
-     - nothing
+     - [TEST.PostTest] 101
    *
    * Question:
      - param1 mark variable explain */
-  putTest( req?: Req.PutTest ): Observable< Res.PutTest > {
+  getTest( req?: Req.GetTest ): Observable< Res.GetTest > {
 
     if ( !req || req?.preloader?.animate ) this.preloaderService.start()
 
@@ -121,12 +121,12 @@ export class Test2Service {
     .set( 'param7', encodeURIComponent( JSON.stringify( req?.param7 ) ) )
     .set( 'param8', this.setReq( req?.param8 ) )
 
-    return this.http.put < Res.PutTest > ( environment.api.concat( '/api/http://localhost:8080/test2/test' ), parameters, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
+    return this.http.get < Res.GetTest > ( environment.api.concat( '/api/http://localhost:8080/test/test?' ).concat( parameters.toString() ), { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
   }
 
   /** 
    * Description: function description 
-     - Code: 201
+     - Code: 101
      - Complete: true
    *
    * Process: 
@@ -134,7 +134,7 @@ export class Test2Service {
    *
    * Question:
      - param1 mark variable explain */
-  deleteTest( req?: Req.DeleteTest ): Observable< Res.DeleteTest > {
+  postTest( req?: Req.PostTest ): Observable< Res.PostTest > {
 
     if ( !req || req?.preloader?.animate ) this.preloaderService.start()
 
@@ -149,6 +149,6 @@ export class Test2Service {
     .set( 'param7', encodeURIComponent( JSON.stringify( req?.param7 ) ) )
     .set( 'param8', this.setReq( req?.param8 ) )
 
-    return this.http.delete < Res.DeleteTest > ( environment.api.concat( '/api/http://localhost:8080/test2/test?' ).concat( parameters.toString() ), { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
+    return this.http.post < Res.PostTest > ( environment.api.concat( '/api/http://localhost:8080/test/test' ), parameters, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
   }
 }

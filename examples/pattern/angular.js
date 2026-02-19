@@ -1,128 +1,120 @@
-const PATH = require( 'path' )
+const PATH = require("path");
 
-const BASE = 'out/angular'
+const BASE = "out/angular";
 
 const LIB = {
-
   model: {
-
     /**
      * Description of associated functions.
      * @param { object } PROC - https://www.npmjs.com/package/accp#obj
-     * @returns 
+     * @returns
      */
-    proc: function ( PROC ) {
+    proc: function (PROC) {
+      if (PROC)
+        return Array.from(
+          PROC,
+          (ROW) => `- [${ROW.NAME}] ${ROW.MARK || ROW.CODE}`,
+        ).join("\n" + getTab(5, 1));
 
-      if ( PROC ) return Array.from( PROC, ROW => `- [${ ROW.NAME }] ${ ROW.MARK || ROW.CODE }` ).join( '\n' + getTab( 5, 1 ) )
-
-      return '- nothing'
+      return "- nothing";
     },
 
     /**
      * Parameter description.
      * @param { object } MARK - https://www.npmjs.com/package/accp#obj
-     * @returns 
+     * @returns
      */
-    mark: function ( MARK ) {
+    mark: function (MARK) {
+      if (MARK)
+        return Array.from(
+          MARK,
+          (ROW) => `- ${ROW.NAME} ${ROW.MARK || ROW.CODE}`,
+        ).join("\n" + getTab(5, 1));
 
-      if ( MARK ) return Array.from( MARK, ROW => `- ${ ROW.NAME } ${ ROW.MARK || ROW.CODE }` ).join( '\n' + getTab( 5, 1 ) )
-
-      return '- nothing'
+      return "- nothing";
     },
 
     /**
      * HTTP method information.
      * @param { object } FUNC - https://www.npmjs.com/package/accp#obj
-     * @returns 
+     * @returns
      */
-    method: function ( FUNC ) {
+    method: function (FUNC) {
+      let path = (p) => (p.indexOf("/") > 1 ? p : p.replace("/", ""));
 
-      let path = ( p ) => p.indexOf( '/' ) > 1 ? p : p.replace( '/', '' )
-
-      if ( FUNC.GET ) {
-
+      if (FUNC.GET) {
         return {
-
-          PATH: path( FUNC.GET ),
-          NAME: 'get',
-          QUERY: true
-        }
+          PATH: path(FUNC.GET),
+          NAME: "get",
+          QUERY: true,
+        };
       }
 
-      if ( FUNC.PUT ) {
-
+      if (FUNC.PUT) {
         return {
-
-          PATH: path( FUNC.PUT ),
-          NAME: 'put',
-          QUERY: false
-        }
+          PATH: path(FUNC.PUT),
+          NAME: "put",
+          QUERY: false,
+        };
       }
 
-      if ( FUNC.POST ) {
-
+      if (FUNC.POST) {
         return {
-
-          PATH: path( FUNC.POST ),
-          NAME: 'post',
-          QUERY: false
-        }
+          PATH: path(FUNC.POST),
+          NAME: "post",
+          QUERY: false,
+        };
       }
 
-      if ( FUNC.PATCH ) {
-
+      if (FUNC.PATCH) {
         return {
-
-          PATH: path( FUNC.PATCH ),
-          NAME: 'patch',
-          QUERY: false
-        }
+          PATH: path(FUNC.PATCH),
+          NAME: "patch",
+          QUERY: false,
+        };
       }
 
       return {
-
-        PATH: path( FUNC.DELETE ),
-        NAME: 'delete',
-        QUERY: true
-      }
+        PATH: path(FUNC.DELETE),
+        NAME: "delete",
+        QUERY: true,
+      };
     },
 
     /**
      * API Request parameter settings.
      * @param { object } REQ - https://www.npmjs.com/package/accp#obj
-     * @returns 
+     * @returns
      */
-    paramters: function ( REQ ) {
+    paramters: function (REQ, paths) {
+      if (REQ)
+        return Array.from(
+          REQ.filter((ROW) => !paths || !paths.includes(ROW.NAME)),
+          (ROW) => {
+            if (ROW.ARRAY)
+              return `.set( '${ROW.NAME}', encodeURIComponent( JSON.stringify( req?.${ROW.NAME} ) ) )`;
 
-      if ( REQ ) return Array.from( REQ, ( ROW ) => {
+            switch (ROW.CLASS) {
+              case "Int":
+              case "Float":
+              case "Double": {
+                return `.set( '${ROW.NAME}', this.setReq( req?.${ROW.NAME} ) )`;
+              }
+              case "String": {
+                return `.set( '${ROW.NAME}', this.setReq( req?.${ROW.NAME}, true ) )`;
+              }
+              case "Boolean": {
+                return `.set( '${ROW.NAME}', this.setReq( req?.${ROW.NAME} ) )`;
+              }
+              default: {
+                return `.set( '${ROW.NAME}', encodeURIComponent( JSON.stringify( req?.${ROW.NAME} ) ) )`;
+              }
+            }
+          },
+        ).join("\n" + getTab(2));
 
-        if ( ROW.ARRAY ) return `.set( '${ ROW.NAME }', encodeURIComponent( JSON.stringify( req?.${ ROW.NAME } ) ) )`
-
-        switch ( ROW.CLASS ) {
-
-          case 'Int':
-          case 'Float':
-          case 'Double': {
-
-            return `.set( '${ ROW.NAME }', this.setReq( req?.${ ROW.NAME } ) )`
-          }
-          case 'String': {
-
-            return `.set( '${ ROW.NAME }', this.setReq( req?.${ ROW.NAME }, true ) )`
-          }
-          case 'Boolean': {
-
-            return `.set( '${ ROW.NAME }', this.setReq( req?.${ ROW.NAME } ) )`
-          }
-          default: {
-
-            return `.set( '${ ROW.NAME }', encodeURIComponent( JSON.stringify( req?.${ ROW.NAME } ) ) )`
-          }
-        }
-      } ).join( '\n' + getTab( 2 ) )
-
-      return ''
-    }
+      return "";
+    },
   },
 
   /**
@@ -130,27 +122,42 @@ const LIB = {
    * @param { object } DATA - Request, Response, Struct information(#https://www.npmjs.com/package/accp#obj).
    * @param { boolean } req - Whether or not it is a Request object.
    * @param { boolean } [clear=false] - Whether or not to annotate, output the specified annotation contents.
-   * @returns 
+   * @returns
    */
-  annotation: function ( DATA, req, clear = false ) {
+  annotation: function (DATA, req, clear = false) {
+    var param = new Array();
 
-    var param = new Array()
+    if (!DATA) return "*";
 
-    if ( !DATA ) return '*'
+    if (req)
+      return param
+        .concat(
+          Array.from(
+            DATA,
+            (ROW) =>
+              `* @param { ${getClass(ROW.CLASS, true)}${getArray(ROW.ARRAY)} } data.${ROW.NAME} ${ROW.MARK}`,
+          ),
+        )
+        .join("\n" + getTab(3, 1));
 
-    if ( req ) return param.concat( Array.from( DATA, ( ROW ) => `* @param { ${ getClass( ROW.CLASS, true ) }${ getArray( ROW.ARRAY ) } } data.${ ROW.NAME } ${ ROW.MARK }` ) ).join( '\n' + getTab( 3, 1 ) )
-
-    return ( clear ? [
-
-      '* @param { { data?: any, clear?: boolean, preloader?: boolean } } data',
-      '* @param { any? } data.data 할당할 파라미터 객체',
-      '* @param { boolean? } data.clear 초기화 여부',
-      '* @param { boolean? } data.preloader 프리로더 여부',
-    ] : [
-
-      '* @param { any } data'
-
-    ] ).concat( Array.from( DATA, ( ROW ) => `* @param { ${ getClass( ROW.CLASS, true ) }${ getArray( ROW.ARRAY ) } } data${ clear ? '.data' : '' }.${ ROW.NAME } ${ ROW.MARK }` ) ).join( '\n' + getTab( 3, 1 ) )
+    return (
+      clear
+        ? [
+            "* @param { { data?: any, clear?: boolean, preloader?: boolean } } data",
+            "* @param { any? } data.data 할당할 파라미터 객체",
+            "* @param { boolean? } data.clear 초기화 여부",
+            "* @param { boolean? } data.preloader 프리로더 여부",
+          ]
+        : ["* @param { any } data"]
+    )
+      .concat(
+        Array.from(
+          DATA,
+          (ROW) =>
+            `* @param { ${getClass(ROW.CLASS, true)}${getArray(ROW.ARRAY)} } data${clear ? ".data" : ""}.${ROW.NAME} ${ROW.MARK}`,
+        ),
+      )
+      .join("\n" + getTab(3, 1));
   },
 
   /**
@@ -158,116 +165,102 @@ const LIB = {
    * @param { string } NAME - Object name.
    * @param { object } DATA - Request, Response, Struct information(#https://www.npmjs.com/package/accp#obj).
    * @param { boolean } struct - Whether to refer to a Struct object.
-   * @returns 
+   * @returns
    */
-  initialize: function ( NAME, DATA, struct = false ) {
-
+  initialize: function (NAME, DATA, struct = false) {
     /**
      * Setting initial object declaration value.
-     * @param { object } DATA 
+     * @param { object } DATA
      * @param { boolean } struct - Whether to refer to a Struct object.
-     * @returns 
+     * @returns
      */
-    let value = function ( DATA, struct = false ) {
+    let value = function (DATA, struct = false) {
+      if (DATA.ARRAY) return "[]";
 
-      if ( DATA.ARRAY ) return '[]'
-
-      switch ( DATA.CLASS ) {
-
-        case 'Data': {
-
-          return `new Object()`
+      switch (DATA.CLASS) {
+        case "Data": {
+          return `new Object()`;
         }
         default: {
-
-          return `new ${ struct ? 'Struct.' : '' }${ DATA.CLASS }()`
+          return `new ${struct ? "Struct." : ""}${DATA.CLASS}()`;
         }
       }
-    }
+    };
 
-    if ( DATA ) return Array.from( DATA, ( ROW ) => {
-
-      switch ( ROW.CLASS ) {
-
-        case NAME:
-        case 'Int':
-        case 'Float':
-        case 'Double':
-        case 'Boolean': {
-
-          return `/** @type { ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) } } ${ ROW.MARK } */\n${ getTab( 1 ) }public ${ROW.NAME }?: ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) }`
+    if (DATA)
+      return Array.from(DATA, (ROW) => {
+        switch (ROW.CLASS) {
+          case NAME:
+          case "Int":
+          case "Float":
+          case "Double":
+          case "Boolean": {
+            return `/** @type { ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)} } ${ROW.MARK} */\n${getTab(1)}public ${ROW.NAME}?: ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)}`;
+          }
+          case "String": {
+            return `/** @type { ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)} } ${ROW.MARK} */\n${getTab(1)}public ${ROW.NAME}?: ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)}${!ROW.ARRAY ? " = ''" : ""}`;
+          }
+          default: {
+            return `/** @type { ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)} } ${ROW.MARK} */\n${getTab(1)}public ${ROW.NAME}: ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)} = ${value(ROW, struct)}`;
+          }
         }
-        case 'String': {
+      }).join("\n" + getTab(1));
 
-          return `/** @type { ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) } } ${ ROW.MARK } */\n${ getTab( 1 ) }public ${ROW.NAME }?: ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) }${ !ROW.ARRAY ? ' = \'\'' : '' }`
-        }
-        default: {
-
-          return `/** @type { ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) } } ${ ROW.MARK } */\n${ getTab( 1 ) }public ${ROW.NAME }: ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) } = ${ value( ROW, struct ) }`
-        }
-      }
-
-    } ).join( '\n' + getTab( 1 ) )
-
-    return ''
+    return "";
   },
 
   /**
    * Constructor parameter output.
    * @param { object } DATA - Request, Response, Struct information(#https://www.npmjs.com/package/accp#obj).
    * @param { boolean } struct - Whether to refer to a Struct object.
-   * @returns 
+   * @returns
    */
-  constructor: function ( DATA, struct = false ) {
+  constructor: function (DATA, struct = false) {
+    if (DATA)
+      return Array.from(
+        DATA,
+        (ROW) =>
+          `${ROW.NAME}?: ${getClass(ROW.CLASS, struct)}${getArray(ROW.ARRAY)}`,
+      ).join(", ");
 
-    if ( DATA ) return Array.from( DATA, ( ROW ) => `${ ROW.NAME }?: ${ getClass( ROW.CLASS, struct ) }${ getArray( ROW.ARRAY ) }` ).join( ', ' )
-
-    return ''
-  }
-}
+    return "";
+  },
+};
 
 /**
  * Returns tab space.
  * @param { number } depth - indentation depth.
  * @param { string } indentation - Indentation space size.
- * @returns 
+ * @returns
  */
-function getTab ( depth, indentation = 2 ) {
-
-  return ''.padEnd( depth * indentation, ' ' )
+function getTab(depth, indentation = 2) {
+  return "".padEnd(depth * indentation, " ");
 }
 
 /**
  * Converting ACCP data type to Angular data type.
  * @param { object } name - Object class name.
  * @param { boolean } struct - Whether to refer to a Struct object.
- * @returns 
+ * @returns
  */
-function getClass ( name, struct = false ) {
-
-  switch ( name ) {
-
-    case 'Int':
-    case 'Float':
-    case 'Double': {
-
-      return 'number'
+function getClass(name, struct = false) {
+  switch (name) {
+    case "Int":
+    case "Float":
+    case "Double": {
+      return "number";
     }
-    case 'Data': {
-
-      return 'any'
+    case "Data": {
+      return "any";
     }
-    case 'String': {
-
-      return name.toLowerCase()
+    case "String": {
+      return name.toLowerCase();
     }
-    case 'Boolean': {
-
-      return name.toLowerCase() + ' | number'
+    case "Boolean": {
+      return name.toLowerCase() + " | number";
     }
     default: {
-
-      return ( struct ? 'Struct.' : '' ) + name
+      return (struct ? "Struct." : "") + name;
     }
   }
 }
@@ -275,38 +268,40 @@ function getClass ( name, struct = false ) {
 /**
  * Array or not.
  * @param { boolean } arr
- * @returns 
+ * @returns
  */
-function getArray ( arr ) {
-
-  return arr ? '[]' : ''
+function getArray(arr) {
+  return arr ? "[]" : "";
 }
 
 /**
  * Convert first letter to uppercase.
  * @param { string } str - Character to convert.
- * @param { boolean } upper - Capitalized or not. 
+ * @param { boolean } upper - Capitalized or not.
  * @param { boolean } lower - Whether to convert to lowercase except for the first character.
  * @returns { string }
  */
-function getCapitalize ( str, upper = true, lower = true ) {
-
-  return ( upper ? str.substring( 0, 1 ).toUpperCase() : str.substring( 0, 1 ).toLowerCase() ) + ( lower ? str.substring( 1 ).toLowerCase() : str.substring( 1 ) )
+function getCapitalize(str, upper = true, lower = true) {
+  return (
+    (upper
+      ? str.substring(0, 1).toUpperCase()
+      : str.substring(0, 1).toLowerCase()) +
+    (lower ? str.substring(1).toLowerCase() : str.substring(1))
+  );
 }
 
 /**
  * Create model file.
  */
-function setModel ( OBJ, GEN ) {
-
-  for ( API of OBJ.API ) {
-
+function setModel(OBJ, GEN) {
+  for (API of OBJ.API) {
     /* set api */
-    var api = new GEN( PATH.join( BASE, 'api', `${ API.NAME.toLowerCase() }.ts` ) )
+    var api = new GEN(PATH.join(BASE, "api", `${API.NAME.toLowerCase()}.ts`));
 
-    api.open()
+    api.open();
 
-    api.print( `
+    api.print(
+      `
 
 import {
   map, 
@@ -344,16 +339,16 @@ import {
 } from 'src/environments/environment'
 
 /* import request */
-import * as Req from '../req/${ API.NAME.toLowerCase() }'
+import * as Req from '../req/${API.NAME.toLowerCase()}'
 
 /* import response */
-import * as Res from '../res/${ API.NAME.toLowerCase() }'
+import * as Res from '../res/${API.NAME.toLowerCase()}'
 
 @Injectable( {
 
   providedIn: 'root'
 } )
-export class ${ getCapitalize( API.NAME ) }Service {
+export class ${getCapitalize(API.NAME)}Service {
 
   constructor(
 
@@ -405,58 +400,68 @@ export class ${ getCapitalize( API.NAME ) }Service {
       return ''
     }
   }
-  ${ Array.from( API.FUNC.filter( FUNC => FUNC.COMP ), ( FUNC ) => {
+  ${Array.from(
+    API.FUNC.filter((FUNC) => FUNC.COMP),
+    (FUNC) => {
+      var method = LIB.model.method(FUNC);
 
-    var method = LIB.model.method( FUNC )
+      var urlPath = method.PATH.replace(
+        /:([a-zA-Z_][a-zA-Z0-9_]*)/g,
+        "' + req?.$1 + '",
+      );
 
-    return `
+      return `
   /** 
-   * Description: ${ FUNC.DESC } 
-     - Code: ${ FUNC.CODE }
-     - Complete: ${ FUNC.COMP.toString() }
+   * Description: ${FUNC.DESC} 
+     - Code: ${FUNC.CODE}
+     - Complete: ${FUNC.COMP.toString()}
    *
    * Process: 
-     ${ LIB.model.proc( FUNC.PROC ) }
+     ${LIB.model.proc(FUNC.PROC)}
    *
    * Question:
-     ${ LIB.model.mark( FUNC.MARK ) } */
-  ${ getCapitalize( FUNC.NAME, false, false ) }( req?: Req.${ FUNC.NAME } ): Observable< Res.${ FUNC.NAME } > {
+     ${LIB.model.mark(FUNC.MARK)} */
+  ${getCapitalize(FUNC.NAME, false, false)}( req?: Req.${FUNC.NAME} ): Observable< Res.${FUNC.NAME} > {
 
     if ( !req || req?.preloader?.animate ) this.preloaderService.start()
 
     let parameters: HttpParams = new HttpParams()
 
-    ${ LIB.model.paramters( FUNC.REQ ) }
+    ${LIB.model.paramters(FUNC.REQ, FUNC.PARAM)}
 
-    return this.http.${ method.NAME } < Res.${ FUNC.NAME } > ( environment.api.concat( '/api/${ API.BASE }/${ method.PATH }${ method.QUERY ? '?\' ).concat( parameters.toString() )' : '\' ), parameters' }, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
-  }`
-  } ).join( '\n' ) }
+    return this.http.${method.NAME} < Res.${FUNC.NAME} > ( environment.api.concat( '/api/${API.BASE}/${urlPath}${method.QUERY ? "?' ).concat( parameters.toString() )" : "' ), parameters"}, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
+  }`;
+    },
+  ).join("\n")}
 }
-`.replace( /^\n+/, '' ) )
+`.replace(/^\n+/, ""),
+    );
 
-    api.close()
+    api.close();
 
     /* set req */
-    var req = new GEN( PATH.join( BASE, 'req', `${ API.NAME.toLowerCase() }.ts` ) )
+    var req = new GEN(PATH.join(BASE, "req", `${API.NAME.toLowerCase()}.ts`));
 
-    req.open()
+    req.open();
 
-    req.print( `
+    req.print(
+      `
 
 import * as Struct from '../pub/struct'
 
-${ Array.from( API.FUNC, FUNC => `
+${Array.from(API.FUNC, (FUNC) =>
+  `
 
-/** Description: ${ FUNC.DESC } */
-export class ${ FUNC.NAME } extends Struct.Preloader {
+/** Description: ${FUNC.DESC} */
+export class ${FUNC.NAME} extends Struct.Preloader {
 
-  ${ LIB.initialize( FUNC.NAME, FUNC.REQ, true ) }
+  ${LIB.initialize(FUNC.NAME, FUNC.REQ, true)}
 
   /**
    * @constructor
-   ${ LIB.annotation( FUNC.REQ, true ) }
+   ${LIB.annotation(FUNC.REQ, true)}
    */
-  constructor( data?: { ${ LIB.constructor( FUNC.REQ, true ) } } ) {
+  constructor( data?: { ${LIB.constructor(FUNC.REQ, true)} } ) {
 
     super()
 
@@ -464,9 +469,9 @@ export class ${ FUNC.NAME } extends Struct.Preloader {
   }
 
   /** 초기화 함수
-   ${ LIB.annotation( FUNC.REQ, false, true ) }
+   ${LIB.annotation(FUNC.REQ, false, true)}
    */
-  onInit( data?: { clear?: boolean, data?: { ${ LIB.constructor( FUNC.REQ, true ) } }, preloader?: Struct.PreloaderInterface } ) {
+  onInit( data?: { clear?: boolean, data?: { ${LIB.constructor(FUNC.REQ, true)} }, preloader?: Struct.PreloaderInterface } ) {
 
     if ( data?.clear ) Struct.setClear( this )
 
@@ -477,56 +482,61 @@ export class ${ FUNC.NAME } extends Struct.Preloader {
     return this
   }
 }
-`.replace( /^\n+/, '' ) ).join( '' ) }
-`.replace( /^\n+/, '' ) )
+`.replace(/^\n+/, ""),
+).join("")}
+`.replace(/^\n+/, ""),
+    );
 
-    req.close()
+    req.close();
 
     /* set res */
-    var res = new GEN( PATH.join( BASE, 'res', `${ API.NAME.toLowerCase() }.ts` ) )
+    var res = new GEN(PATH.join(BASE, "res", `${API.NAME.toLowerCase()}.ts`));
 
-    res.open()
+    res.open();
 
-    res.print( `
+    res.print(
+      `
 
 import * as Struct from '../pub/struct'
 
-${ Array.from( API.FUNC, FUNC => `
+${Array.from(API.FUNC, (FUNC) =>
+  `
 
-/** Description: ${ FUNC.DESC } */
-export class ${ FUNC.NAME } {
+/** Description: ${FUNC.DESC} */
+export class ${FUNC.NAME} {
 
-  ${ LIB.initialize( FUNC.NAME, FUNC.RES, true ) }
+  ${LIB.initialize(FUNC.NAME, FUNC.RES, true)}
 
   /** @type { Struct.Status | undefined } 상태 정보 */
   public status?: Struct.Status
 
   /**
    * @constructor
-   ${ LIB.annotation( FUNC.RES, false ) }
+   ${LIB.annotation(FUNC.RES, false)}
    */
-  constructor( data?: { ${ LIB.constructor( FUNC.RES, true ) } } ) {
+  constructor( data?: { ${LIB.constructor(FUNC.RES, true)} } ) {
 
     Struct.setAttribute( this, data )
   }
 }
-`.replace( /^\n+/, '' ) ).join( '' ) }
-`.replace( /^\n+/, '' ) )
+`.replace(/^\n+/, ""),
+).join("")}
+`.replace(/^\n+/, ""),
+    );
 
-    res.close()
+    res.close();
   }
 }
 
 /**
  * Create structure file.
  */
-function setStruct ( OBJ, GEN ) {
+function setStruct(OBJ, GEN) {
+  var out = new GEN(PATH.join(BASE, "pub", "struct.ts"));
 
-  var out = new GEN( PATH.join( BASE, 'pub', 'struct.ts' ) )
+  out.open();
 
-  out.open()
-
-  out.print( `
+  out.print(`
 export function setClone( d: any ): any {
 
   return Object.assign( new Object(), d )
@@ -589,65 +599,67 @@ export interface PreloaderInterface {
   animate: boolean
 }
 
-${ Array.from( OBJ.STRUCT, STRUCT => `
+${Array.from(OBJ.STRUCT, (STRUCT) =>
+  `
 
-/** Description: ${ STRUCT.MARK } */
-export class ${ STRUCT.NAME } {
+/** Description: ${STRUCT.MARK} */
+export class ${STRUCT.NAME} {
 
   [ key: string ]: any
 
-  ${ LIB.initialize( STRUCT.NAME, STRUCT.DATA ) }
+  ${LIB.initialize(STRUCT.NAME, STRUCT.DATA)}
 
   /**
    * @constructor
-   ${ LIB.annotation( STRUCT.DATA, true ) }
+   ${LIB.annotation(STRUCT.DATA, true)}
    */
-  constructor( data? : { ${ LIB.constructor( STRUCT.DATA ) } } ) {
+  constructor( data? : { ${LIB.constructor(STRUCT.DATA)} } ) {
 
     setAttribute( this, data )
   }
 
   /** 초기화 함수
-   ${ LIB.annotation( STRUCT.DATA, false ) }
+   ${LIB.annotation(STRUCT.DATA, false)}
    */
-  onInit( data?: { ${ LIB.constructor( STRUCT.DATA ) } } ) {
+  onInit( data?: { ${LIB.constructor(STRUCT.DATA)} } ) {
 
     setAttribute( this, data )
 
     return this
   }
 }
-`.replace( /^\n+/, '' ) ).join( '\n' ) }
-` )
+`.replace(/^\n+/, ""),
+).join("\n")}
+`);
 
-  out.close()
+  out.close();
 }
 
 /**
  * Generate code file.
  */
-function setCode ( OBJ, GEN ) {
+function setCode(OBJ, GEN) {
+  var out = new GEN(PATH.join(BASE, "pub", "code.ts"));
 
-  var out = new GEN( PATH.join( BASE, 'pub', 'code.ts' ) )
+  out.open();
 
-  out.open()
-
-  out.print( `
+  out.print(
+    `
 
 export class CODE {
 
-  ${ Array.from( OBJ.CODE, CODE => [ `/* ${ CODE.NAME } */` ].concat( Array.from( CODE.CODE, ROW => `public static readonly ${ CODE.NAME }_${ ROW.NAME } = ${ ROW.CODE }` ) ).join( '\n' + getTab( 1 ) ) ).join( '\n' + getTab( 1 ) ) }
+  ${Array.from(OBJ.CODE, (CODE) => [`/* ${CODE.NAME} */`].concat(Array.from(CODE.CODE, (ROW) => `public static readonly ${CODE.NAME}_${ROW.NAME} = ${ROW.CODE}`)).join("\n" + getTab(1))).join("\n" + getTab(1))}
 }
-`.replace( /^\n+/, '' ) )
+`.replace(/^\n+/, ""),
+  );
 
-  out.close()
+  out.close();
 }
 
-module.exports = function ( OBJ, GEN ) {
+module.exports = function (OBJ, GEN) {
+  setStruct(OBJ, GEN);
 
-  setStruct( OBJ, GEN )
+  setModel(OBJ, GEN);
 
-  setModel( OBJ, GEN )
-
-  setCode( OBJ, GEN )
-}
+  setCode(OBJ, GEN);
+};

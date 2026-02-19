@@ -4,7 +4,7 @@ const ROUTER = require( 'express' ).Router()
 /* Virtual file for writing example code. */
 const FUNC = require( '..' )
 
-const MODEL = require( '../model/test1' )
+const MODEL = require( '../model/test' )
 
 /** 
  * Code: 100
@@ -12,8 +12,7 @@ const MODEL = require( '../model/test1' )
  * Description: function description 
  * 
  * Process: 
- * * [TEST1.PostTest] 101
- * * [TEST2.DeleteTest] 201
+ * * [TEST.PostTest] 101
  *
  * Question:
  * * param1 mark variable explain */

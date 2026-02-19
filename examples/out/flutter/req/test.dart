@@ -2,11 +2,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'package:flutter/pub/struct.dart';
 
-part 'test2.g.dart';
+part 'test.g.dart';
 
 /// Description: function description
 @JsonSerializable()
-class PutTest {
+class GetTest {
 
   /// int variable
   @JsonKey( name: 'param1' ) int? param1;
@@ -25,7 +25,7 @@ class PutTest {
   /// description of the value
   @JsonKey( name: 'param8' ) int? param8;
 
-  PutTest( { 
+  GetTest( { 
 
     this.param1,
     this.param2,
@@ -37,14 +37,14 @@ class PutTest {
     this.param8
    } );
 
-  factory PutTest.fromJson( Map< String, dynamic > json ) => _$PutTestFromJson( json );
+  factory GetTest.fromJson( Map< String, dynamic > json ) => _$GetTestFromJson( json );
 
-  Map< String, dynamic > toJson() => _$PutTestToJson( this );
+  Map< String, dynamic > toJson() => _$GetTestToJson( this );
 }
 
 /// Description: function description
 @JsonSerializable()
-class DeleteTest {
+class PostTest {
 
   /// int variable
   @JsonKey( name: 'param1' ) int? param1;
@@ -63,7 +63,7 @@ class DeleteTest {
   /// description of the value
   @JsonKey( name: 'param8' ) int? param8;
 
-  DeleteTest( { 
+  PostTest( { 
 
     this.param1,
     this.param2,
@@ -75,8 +75,8 @@ class DeleteTest {
     this.param8
    } );
 
-  factory DeleteTest.fromJson( Map< String, dynamic > json ) => _$DeleteTestFromJson( json );
+  factory PostTest.fromJson( Map< String, dynamic > json ) => _$PostTestFromJson( json );
 
-  Map< String, dynamic > toJson() => _$DeleteTestToJson( this );
+  Map< String, dynamic > toJson() => _$PostTestToJson( this );
 }
 

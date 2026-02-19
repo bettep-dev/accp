@@ -34,16 +34,16 @@ import {
 } from 'src/environments/environment'
 
 /* import request */
-import * as Req from '../req/test1'
+import * as Req from '../req/test_path'
 
 /* import response */
-import * as Res from '../res/test1'
+import * as Res from '../res/test_path'
 
 @Injectable( {
 
   providedIn: 'root'
 } )
-export class Test1Service {
+export class Test_pathService {
 
   constructor(
 
@@ -98,58 +98,44 @@ export class Test1Service {
   
   /** 
    * Description: function description 
-     - Code: 100
-     - Complete: true
-   *
-   * Process: 
-     - [TEST1.PostTest] 101
-     - [TEST2.DeleteTest] 201
-   *
-   * Question:
-     - param1 mark variable explain */
-  getTest( req?: Req.GetTest ): Observable< Res.GetTest > {
-
-    if ( !req || req?.preloader?.animate ) this.preloaderService.start()
-
-    let parameters: HttpParams = new HttpParams()
-
-    .set( 'param1', this.setReq( req?.param1 ) )
-    .set( 'param2', encodeURIComponent( JSON.stringify( req?.param2 ) ) )
-    .set( 'param3', this.setReq( req?.param3 ) )
-    .set( 'param4', this.setReq( req?.param4 ) )
-    .set( 'param5', this.setReq( req?.param5, true ) )
-    .set( 'param6', this.setReq( req?.param6 ) )
-    .set( 'param7', encodeURIComponent( JSON.stringify( req?.param7 ) ) )
-    .set( 'param8', this.setReq( req?.param8 ) )
-
-    return this.http.get < Res.GetTest > ( environment.api.concat( '/api/http://localhost:8080/test1/test?' ).concat( parameters.toString() ), { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
-  }
-
-  /** 
-   * Description: function description 
-     - Code: 101
+     - Code: 200
      - Complete: true
    *
    * Process: 
      - nothing
    *
    * Question:
-     - param1 mark variable explain */
-  postTest( req?: Req.PostTest ): Observable< Res.PostTest > {
+     - nothing */
+  getTestByPath( req?: Req.GetTestByPath ): Observable< Res.GetTestByPath > {
 
     if ( !req || req?.preloader?.animate ) this.preloaderService.start()
 
     let parameters: HttpParams = new HttpParams()
 
-    .set( 'param1', this.setReq( req?.param1 ) )
-    .set( 'param2', encodeURIComponent( JSON.stringify( req?.param2 ) ) )
-    .set( 'param3', this.setReq( req?.param3 ) )
-    .set( 'param4', this.setReq( req?.param4 ) )
-    .set( 'param5', this.setReq( req?.param5, true ) )
-    .set( 'param6', this.setReq( req?.param6 ) )
-    .set( 'param7', encodeURIComponent( JSON.stringify( req?.param7 ) ) )
-    .set( 'param8', this.setReq( req?.param8 ) )
+    
 
-    return this.http.post < Res.PostTest > ( environment.api.concat( '/api/http://localhost:8080/test1/test' ), parameters, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
+    return this.http.get < Res.GetTestByPath > ( environment.api.concat( '/api/http://localhost:8080/test_path/test/' + req?.param1 + '?' ).concat( parameters.toString() ), { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
+  }
+
+  /** 
+   * Description: function description 
+     - Code: 201
+     - Complete: true
+   *
+   * Process: 
+     - nothing
+   *
+   * Question:
+     - nothing */
+  putTextByPath( req?: Req.PutTextByPath ): Observable< Res.PutTextByPath > {
+
+    if ( !req || req?.preloader?.animate ) this.preloaderService.start()
+
+    let parameters: HttpParams = new HttpParams()
+
+    .set( 'param2', this.setReq( req?.param2, true ) )
+    .set( 'param3', this.setReq( req?.param3, true ) )
+
+    return this.http.put < Res.PutTextByPath > ( environment.api.concat( '/api/http://localhost:8080/test_path/test/' + req?.param1 + '/' + req?.param1 + '' ), parameters, { headers: this.configService.headers } ).pipe( map( this.response ), catchError( this.error ) )
   }
 }
