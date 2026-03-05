@@ -1,18 +1,19 @@
 {
   "name": "accp",
-  "main": "./lib/accp",
+  "main": "./lib/core.js",
   "bin": {
-    "accp": "./lib/accp.js"
+    "accp": "./lib/accp.js",
+    "accp-mcp": "./lib/mcp-server.mjs"
   },
   "bugs": {
     "email": "hongdaesik88@gmail.com"
   },
   "author": {
-    "name": "HONG DAESIK",
+    "name": "Bettep",
     "email": "hongdaesik88@gmail.com"
   },
   "license": "MIT",
-  "version": "1.4.4",
+  "version": "2.0.1",
   "keywords": [
     "api",
     "code",
@@ -26,14 +27,23 @@
     "angular",
     "flutter",
     "pattern",
-    "generate"
+    "generate",
+    "mcp",
+    "llm",
+    "ai"
   ],
   "homepage": "https://bettep.org",
-  "description": "The code is generated automatically by referring to the pattern file.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bettep-dev/accp"
+  },
+  "description": "The code is generated automatically by referring to the pattern file. Includes MCP server for LLM integration.",
   "preferGlobal": true,
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
     "colors": "1.4.0",
     "commander": "4.0.1",
-    "n-readlines": "1.0.0"
+    "n-readlines": "1.0.0",
+    "zod": "^3.24.0"
   }
 }
