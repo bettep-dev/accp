@@ -40,6 +40,24 @@ cd my-project && accp --compile
 
 All folders are required.
 
+## Syntax
+
+### .api — API Endpoints
+
+![API Syntax](demo/API.png)
+
+### .code — Error Codes
+
+![CODE Syntax](demo/CODE.png)
+
+### .struct — Data Structures
+
+![STRUCT Syntax](demo/STRUCT.png)
+
+### Compile
+
+![Compile Demo](demo/DEMO.png)
+
 ## CLI
 
 | Command              | Description                    |
@@ -53,7 +71,7 @@ Pattern files receive `OBJ` (compiled data) and `GEN` (file writer) as arguments
 
 ```javascript
 module.exports = function (OBJ, GEN) {
-  var file = new GEN("output/api.ts");
+  const file = new GEN("output/api.ts");
   file.open();
   file.print("// generated code\n");
   file.close();
